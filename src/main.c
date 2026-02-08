@@ -3,54 +3,70 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: myapaten <myapaten@student.42.fr>          +#+  +:+       +#+        */
+/*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/07 14:31:53 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/08 18:29:37 by myapaten         ###   ########.fr       */
+/*   Created: 2026/02/08 12:00:00 by myapaten          #+#    #+#             */
+/*   Updated: 2026/02/08 21:28:29 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/rush02.h"
 
-int	main(int argc, char **argv)
+static int	print_error(char *msg)
 {
-	char	*number;
-	t_dict	*dict;
-	char	*result;
+    ft_putstr(msg);
+    return (1);
+}
 
-	if (!validate_args(argc, argv))
-	{
-		write(1, "Error\n", 6);
-		return (1);
-	}
-	if (argc == 3)
-	{
-		dict = parse_dictionary(argv[1]);
-		number = clean_number(argv[2]);
-	}
-	else
-	{
-		dict = parse_dictionary("numbers.dict");
-		number = clean_number(argv[1]);
-	}
-	if (!dict)
-	{
-		write(1, "Dict Error\n", 11);
-		free(number);
-		return (1);
-	}
-	result = convert_number(number, dict);
-	if (!result)
-	{
-		write(1, "Dict Error\n", 11);
-		free(number);
-		free_dictionary(dict);
-		return (1);
-	}
-	ft_putstr(result);
-	write(1, "\n", 1);
-	free(result);
-	free(number);
-	free_dictionary(dict);
-	return (0);
+static char	*get_dict_path(int ac, char **av)
+{
+    if (ac == 3)
+        return (av[1]);
+    return ("numbers.dict");
+}
+
+static char	*get_number(int ac, char **av)
+{
+    if (ac == 3)
+        return (av[2]);
+    return (av[1]);
+}
+
+static int	process_and_print(t_dict *dict, char *num)
+{
+    char	*result;
+    char	*clean;
+
+    clean = clean_number(num);
+    if (!clean)
+        return (0);
+    result = convert_number(clean, dict);
+    free(clean);
+    if (!result)
+        return (0);
+    ft_putstr(result);
+    ft_putstr("\n");
+    free(result);
+    return (1);
+}
+
+int	main(int ac, char **av)
+{
+    t_dict	*dict;
+    char	*num;
+    int		success;
+
+    if (ac < 2 || ac > 3)
+        return (print_error("Error\n"));
+    num = get_number(ac, av);
+    if (!validate_args(ac, av))
+        return (print_error("Error\n"));
+    dict = parse_dictionary(get_dict_path(ac, av));
+    if (!dict)
+        return (print_error("Dict Error\n"));
+    success = process_and_print(dict, num);
+    free_dictionary(dict);
+    if (!success)
+        return (print_error("Dict Error\n"));
+    return (0);
 }

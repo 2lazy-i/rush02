@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   dictionary.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: myapaten <myapaten@student.42.fr>          +#+  +:+       +#+        */
+/*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/07 14:32:17 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/08 18:42:18 by myapaten         ###   ########.fr       */
+/*   Updated: 2026/02/08 21:36:05 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,6 @@ char	*ft_substr(char *str, int start, int len)
 	return (res);
 }
 
-int	skip_spaces(char *line, int i)
-{
-	while (line[i] == ' ' || line[i] == '\t')
-		i++;
-	return (i);
-}
-
 t_dict	*create_node(char *key, char *value)
 {
 	t_dict	*node;
@@ -52,31 +45,30 @@ t_dict	*create_node(char *key, char *value)
 
 t_dict	*parse_line(char *line)
 {
-	int	i;
-	int	key_start;
-	int	key_end;
-	int	val_start;
-	int	val_end;
+    int		i;
+    int		key_start;
+    int		key_end;
+    int		val_start;
+    int		val_end;
+    char	*key;
+    char	*value;
 
-	i = skip_spaces(line, 0);
-	key_start = i;
-	while (line[i] && line[i] != ' ' && line[i] != '\t' && line[i] != ':')
-		i++;
-	key_end = i;
-	i = skip_spaces(line, i);
-	if (line[i] != ':')
-		return (NULL);
-	i++;
-	i = skip_spaces(line, i);
-	val_start = i;
-	while (line[i] && line[i] != '\n')
-		i++;
-	val_end = i;
-	while (val_end > val_start && (line[val_end - 1] == ' ' || line[val_end
-			- 1] == '\t'))
-		val_end--;
-	return (create_node(ft_substr(line, key_start, key_end - key_start),
-			ft_substr(line, val_start, val_end - val_start)));
+    i = skip_spaces(line, 0);
+    key_start = i;
+    key_end = find_key_end(line, i);
+    if (key_end == key_start)
+        return (NULL);
+    i = skip_spaces(line, key_end);
+    if (line[i] != ':')
+        return (NULL);
+    i = skip_spaces(line, i + 1);
+    val_start = i;
+    val_end = find_value_end(line, val_start);
+    if (val_end == val_start)
+        return (NULL);
+    key = ft_substr(line, key_start, key_end - key_start);
+    value = ft_substr(line, val_start, val_end - val_start);
+    return (create_node(key, value));
 }
 
 void	free_dictionary(t_dict *dict)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: myapaten <myapaten@student.42.fr>          +#+  +:+       +#+        */
+/*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/07 14:33:55 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/08 18:32:35 by myapaten         ###   ########.fr       */
+/*   Updated: 2026/02/08 19:03:52 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ int	ft_strlen(char *str)
 {
 	int	i;
 
+	if (!str)
+		return (0);
 	i = 0;
 	while (str[i])
 		i++;
@@ -33,6 +35,8 @@ char	*ft_strdup(char *src)
 	int		i;
 	char	*dup;
 
+	if (!src)
+		return (NULL);
 	len = ft_strlen(src);
 	dup = malloc(len + 1);
 	if (!dup)
@@ -43,7 +47,7 @@ char	*ft_strdup(char *src)
 		dup[i] = src[i];
 		i++;
 	}
-	dup[len] = '\0';
+	dup[i] = '\0';
 	return (dup);
 }
 

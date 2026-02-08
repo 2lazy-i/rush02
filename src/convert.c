@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   convert.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: myapaten <myapaten@student.42.fr>          +#+  +:+       +#+        */
+/*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/07 14:33:28 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/08 18:29:28 by myapaten         ###   ########.fr       */
+/*   Updated: 2026/02/08 21:26:24 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,22 +32,28 @@ static char	*get_scale(int zeros, t_dict *dict)
 
 static char	*append_result(char *result, char *triad_str, char *scale)
 {
-	if (!triad_str || triad_str[0] == '\0')
-	{
-		if (triad_str)
-			free(triad_str);
-		return (result);
-	}
-	if (result && result[0] != '\0')
-		result = ft_strjoin_free(result, " ", 1);
-	result = ft_strjoin_free(result, triad_str, 1);
-	free(triad_str);
-	if (scale)
-	{
-		result = ft_strjoin_free(result, " ", 1);
-		result = ft_strjoin_free(result, scale, 1);
-	}
-	return (result);
+    if (!triad_str || triad_str[0] == '\0')
+    {
+        if (triad_str)
+            free(triad_str);
+        return (result);
+    }
+    if (result && result[0] != '\0')
+    {
+        result = ft_strjoin_free(result, " ", 1);
+        if (!result)
+            return (free(triad_str), NULL);
+    }
+    result = ft_strjoin_free(result, triad_str, 1);
+    if (!result)
+        return (NULL);
+    if (scale)
+    {
+        result = ft_strjoin_free(result, " ", 1);
+        if (result)
+            result = ft_strjoin_free(result, scale, 1);
+    }
+    return (result);
 }
 
 static void	fill_first_triad(char *triad, char *num, int *pos, int first_len)
