@@ -6,35 +6,41 @@
 /*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/07 14:32:05 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/07 15:03:04 by 2lazy            ###   ########.fr       */
+/*   Updated: 2026/02/08 17:14:36 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/rush02.h"
 
-// Validate arguments
-int validate_args(int argc, char **argv)
+static int	is_all_digits(char *str)
 {
-    int i;
-
-    if (argc < 2 || argc > 3)
-        return (0);
+    int	i;
 
     i = 0;
-    while (argv[1][i])
+    while (str[i])
     {
-        if (!ft_isdigit(argv[1][i]))
+        if (!ft_isdigit(str[i]))
             return (0);
         i++;
     }
     return (1);
 }
 
-// Remove leading zeros
-char *clean_number(char *str)
+int	validate_args(int argc, char **argv)
 {
-    int i = 0;
+    if (argc < 2 || argc > 3)
+        return (0);
+    if (argc == 2)
+        return (is_all_digits(argv[1]));
+    return (is_all_digits(argv[2]));
+}
+
+char	*clean_number(char *str)
+{
+    int	i;
+
+    i = 0;
     while (str[i] == '0' && str[i + 1])
         i++;
-    return ft_strdup(str + i);
+    return (ft_strdup(str + i));
 }

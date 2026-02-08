@@ -1,61 +1,74 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   triad.c                                            :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: 2lazy <2lazy@student.42.fr>                  +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2026/02/07 14:33:44 by 2lazy         #+#    #+#                 */
-/*   Updated: 2026/02/08 14:20:48 by anonymous     ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   triad.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/07 14:33:44 by 2lazy             #+#    #+#             */
+/*   Updated: 2026/02/08 17:15:31 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/rush02.h"
 
-// TODO:
-// - Convert 0-999 triad to words
-// - Handle hundreds, 10-19 special case, tens, units
-// - Avoid extra spaces or unnecessary "zero"
-void	char_to_string(char *str, char c)
+static char	*add_space_word(char *result, char *word)
 {
+    char	*tmp;
 
-	str[0] = c;
-	str[1] = '\0';
+    if (!word)
+        return (result);
+    if (!result || result[0] == '\0')
+    {
+        if (result)
+            free(result);
+        return (ft_strdup(word));
+    }
+    tmp = ft_strjoin_free(result, " ", 1);
+    return (ft_strjoin_free(tmp, word, 1));
 }
 
-char	*append_with_space(char *s1, char *s2)
+static char	*handle_tens(char *result, char *triad, t_dict *dict)
 {
-	strcat(s1, " ");
-	strcat(s1, s2);
-	return  (s1);
-}
+    char	key[3];
 
-char *convert_triad(char *triad, t_dict *dict)
-{
-	char	buf[200];
-	char	*result;
-    char	charstr[3];
-
-	result = buf;
-	if (triad[0] != '0')
-	{
-		char_to_string(charstr, triad[0]);
-		result = append_with_space(lookup(dict, charstr), lookup(dict, "100"));
-		result = strcat(result, " ");
-	}
-	if (triad[1] == '1')
-		return (strcat(result, lookup(dict, triad + 1)));
-	if (triad[1] == '0' && triad[2] == '0')
-		return (result);
-	if (triad[1] == '0')
-		return (strcat(result, lookup(dict, triad + 2)));
-	char_to_string(charstr, triad[1]);
-	strcat(charstr, "0");
-	result =  strcat(result, lookup(dict, charstr));
-	result = strcat(result, " ");
-	if (triad[2] == '0')
-		return (result);
-	char_to_string(charstr, triad[2]);
-	result =  strcat(result, lookup(dict, charstr));
+    if (triad[1] != '0')
+    {
+        key[0] = triad[1];
+        key[1] = '0';
+        key[2] = '\0';
+        result = add_space_word(result, lookup(dict, key));
+    }
+    if (triad[2] != '0')
+    {
+        key[0] = triad[2];
+        key[1] = '\0';
+        result = add_space_word(result, lookup(dict, key));
+    }
     return (result);
+}
+
+char	*convert_triad(char *triad, t_dict *dict)
+{
+    char	*result;
+    char	key[4];
+
+    result = ft_strdup("");
+    if (triad[0] != '0')
+    {
+        key[0] = triad[0];
+        key[1] = '\0';
+        result = add_space_word(result, lookup(dict, key));
+        result = add_space_word(result, lookup(dict, "100"));
+    }
+    if (triad[1] == '1')
+    {
+        key[0] = triad[1];
+        key[1] = triad[2];
+        key[2] = '\0';
+        return (add_space_word(result, lookup(dict, key)));
+    }
+    if (triad[1] == '0' && triad[2] == '0')
+        return (result);
+    return (handle_tens(result, triad, dict));
 }

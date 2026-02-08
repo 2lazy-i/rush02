@@ -1,87 +1,116 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        ::::::::            */
-/*   convert.c                                          :+:    :+:            */
-/*                                                     +:+                    */
-/*   By: 2lazy <2lazy@student.42.fr>                  +#+                     */
-/*                                                   +#+                      */
-/*   Created: 2026/02/07 14:33:28 by 2lazy         #+#    #+#                 */
-/*   Updated: 2026/02/08 14:17:03 by anonymous     ########   odam.nl         */
+/*                                                        :::      ::::::::   */
+/*   convert.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/02/07 14:33:28 by 2lazy             #+#    #+#             */
+/*   Updated: 2026/02/08 17:15:41 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/rush02.h"
-// TODO:
-// 1. Split number into triads (groups of 3 digits)
-// 2. Skip "000" triads
-// 3. Call convert_triad() for each triad
-// 4. Append thousand/million/billion if needed
-// 5. Join triads into final string
 
-char *numb_gen(int amount)
+static char	*get_scale(int zeros, t_dict *dict)
 {
-	char	*number;
-	int		n;
+    char	key[50];
+    int		i;
 
-	number = malloc(amount + 2);
-	n = 0;
-	number[n++] = '1';
-	while (n <= amount)
-		number[n++] = '0';
-	number[n] = '\0';
-	return (number);
+    if (zeros < 3)
+        return (NULL);
+    key[0] = '1';
+    i = 1;
+    while (i <= zeros)
+    {
+        key[i] = '0';
+        i++;
+    }
+    key[i] = '\0';
+    return (lookup(dict, key));
 }
 
-void	fill_triad(char triad[4], char *num)
+static char	*append_result(char *result, char *triad_str, char *scale)
 {
-	triad[0] = num[0];
-	triad[1] = num[1];
-	triad[2] = num[2];
-	triad[3] = '\0';
+    if (!triad_str || triad_str[0] == '\0')
+    {
+        if (triad_str)
+            free(triad_str);
+        return (result);
+    }
+    if (result && result[0] != '\0')
+        result = ft_strjoin_free(result, " ", 1);
+    result = ft_strjoin_free(result, triad_str, 1);
+    free(triad_str);
+    if (scale)
+    {
+        result = ft_strjoin_free(result, " ", 1);
+        result = ft_strjoin_free(result, scale, 1);
+    }
+    return (result);
 }
 
-void	partial_triad(char triad[4], char *num, int lacking_numbers)
+static void	fill_first_triad(char *triad, char *num, int *pos, int first_len)
 {
-	int n;
-
-	triad[0] = '0';
-	if (lacking_numbers == 1)
-		triad[1] = num[0];
-		triad[2] = num[1];
-	if (lacking_numbers == 2)
-		triad[1] = '0';
-		triad[2] = num[0];
-	triad[3] = '\0';
+    triad[0] = '0';
+    triad[1] = '0';
+    triad[2] = '0';
+    triad[3] = '\0';
+    if (first_len == 1)
+        triad[2] = num[(*pos)++];
+    else if (first_len == 2)
+    {
+        triad[1] = num[(*pos)++];
+        triad[2] = num[(*pos)++];
+    }
+    else
+    {
+        triad[0] = num[(*pos)++];
+        triad[1] = num[(*pos)++];
+        triad[2] = num[(*pos)++];
+    }
 }
 
-
-char *convert_number(char *num, t_dict *dict)
+static char	*process_triads(char *num, t_dict *dict, int len)
 {
-	char	buf[1000];
     char	*result;
-	char	triad[4];
-	//char 	*number_zero;
-	int		length;
-	int		n;
+    char	triad[4];
+    char	*triad_str;
+    int		pos;
+    int		first_len;
 
-	result = buf;
-	length = ft_strlen2(num);
-	n = 0;
-	if (length % 3 != 0)
-	{
-		partial_triad(triad, num, length % 3);
-		printf("partial triad>%s\n", convert_triad(triad, dict));
-		n += length % 3;
-	}
-	while (n < length / 3)
-	{
-		fill_triad(triad, num + n * 3);
-		printf("triad>%s ", convert_triad(triad, dict));
-		if (length - n * 3 - 3 >= 3)
-			printf("(%d)>%s\n", length - n * 3 - 3, lookup(dict, numb_gen(length - n * 3 - 3)));
-		n++;
-	}
-	//printf("\ntest>%s ", convert_triad("400", dict));
-    return (NULL);
-    //return ft_strdup("zero"); // placeholder
+    result = ft_strdup("");
+    pos = 0;
+    first_len = len % 3;
+    if (first_len == 0)
+        first_len = 3;
+    fill_first_triad(triad, num, &pos, first_len);
+    triad_str = convert_triad(triad, dict);
+    result = append_result(result, triad_str, get_scale(len - pos, dict));
+    while (pos < len)
+    {
+        triad[0] = num[pos++];
+        triad[1] = num[pos++];
+        triad[2] = num[pos++];
+        triad_str = convert_triad(triad, dict);
+        result = append_result(result, triad_str, get_scale(len - pos, dict));
+    }
+    return (result);
+}
+
+char	*convert_number(char *num, t_dict *dict)
+{
+    char	*result;
+    int		len;
+
+    len = ft_strlen(num);
+    if (len == 0)
+        return (ft_strdup(lookup(dict, "0")));
+    result = process_triads(num, dict, len);
+    if (result[0] == '\0')
+    {
+        free(result);
+        return (ft_strdup(lookup(dict, "0")));
+    }
+    return (result);
 }

@@ -6,161 +6,169 @@
 /*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/07 14:32:17 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/07 15:02:57 by 2lazy            ###   ########.fr       */
+/*   Updated: 2026/02/08 17:16:53 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/rush02.h"
 
-// helper: check space
-static int ft_isspace(char c)
+static char	*ft_substr(char *str, int start, int len)
 {
-    return (c == ' ' || c == '\t');
-}
+    char	*res;
+    int		i;
 
-// trim spaces from both ends
-static char *trim_spaces(char *str)
-{
-    int start = 0;
-    int end = 0;
-    int len;
-    char *res;
-
-    while (str[start] && ft_isspace(str[start]))
-        start++;
-
-    end = start;
-    while (str[end])
-        end++;
-    end--;
-    while (end >= start && ft_isspace(str[end]))
-        end--;
-
-    len = end - start + 1;
     res = malloc(len + 1);
     if (!res)
-        return NULL;
-
-    for (int i = 0; i < len; i++)
+        return (NULL);
+    i = 0;
+    while (i < len)
+    {
         res[i] = str[start + i];
-    res[len] = '\0';
-    return res;
-}
-
-// read entire file into buffer
-static char *read_file(int fd)
-{
-    char buffer[4096];
-    char *content;
-    int bytes;
-
-    content = malloc(1);
-    if (!content)
-        return NULL;
-    content[0] = '\0';
-
-    while ((bytes = read(fd, buffer, 4095)) > 0)
-    {
-        buffer[bytes] = '\0';
-        char *tmp = malloc(ft_strlen(content) + bytes + 1);
-        if (!tmp)
-        {
-            free(content);
-            return NULL;
-        }
-        int i = 0;
-        while (content[i])
-        {
-            tmp[i] = content[i];
-            i++;
-        }
-        for (int j = 0; j < bytes; j++)
-            tmp[i + j] = buffer[j];
-        tmp[i + bytes] = '\0';
-        free(content);
-        content = tmp;
-    }
-    if (bytes < 0)
-    {
-        free(content);
-        return NULL;
-    }
-    return content;
-}
-
-// parse dictionary file into linked list
-t_dict *parse_dictionary(char *filename)
-{
-    int fd = open(filename, O_RDONLY);
-    if (fd < 0)
-        return NULL;
-
-    char *content = read_file(fd);
-    close(fd);
-    if (!content)
-        return NULL;
-
-    t_dict *head = NULL;
-    t_dict *new = NULL;
-    int i = 0;
-    int line_start = 0;
-
-    while (content[i])
-    {
-        if (content[i] == '\n' || content[i + 1] == '\0')
-        {
-            int line_end = (content[i] == '\n') ? i : i + 1;
-            int len = line_end - line_start;
-            if (len > 0)
-            {
-                char tmp[len + 1];
-                int k;
-                for (k = 0; k < len; k++)
-                    tmp[k] = content[line_start + k];
-                tmp[k] = '\0';
-
-                // find colon
-                int colon = 0;
-                while (tmp[colon] && tmp[colon] != ':')
-                    colon++;
-
-                if (tmp[colon] == ':')
-                {
-                    tmp[colon] = '\0';
-                    char *key = trim_spaces(tmp);
-                    char *value = trim_spaces(tmp + colon + 1);
-                    if (key && value)
-                    {
-                        new = malloc(sizeof(t_dict));
-                        if (new)
-                        {
-                            new->key = key;
-                            new->value = value;
-                            new->next = head;
-                            head = new;
-                        }
-                    }
-                }
-            }
-            line_start = i + 1;
-        }
         i++;
     }
-
-    free(content);
-    return head;
+    res[len] = '\0';
+    return (res);
 }
 
-// free dictionary memory
-void free_dictionary(t_dict *dict)
+static int	skip_spaces(char *line, int i)
 {
-    t_dict *tmp;
+    while (line[i] == ' ' || line[i] == '\t')
+        i++;
+    return (i);
+}
+
+static t_dict	*create_node(char *key, char *value)
+{
+    t_dict	*node;
+
+    node = malloc(sizeof(t_dict));
+    if (!node)
+        return (NULL);
+    node->key = key;
+    node->value = value;
+    node->next = NULL;
+    return (node);
+}
+
+static t_dict	*parse_line(char *line)
+{
+    int		i;
+    int		key_start;
+    int		key_end;
+    int		val_start;
+    int		val_end;
+
+    i = skip_spaces(line, 0);
+    key_start = i;
+    while (line[i] && line[i] != ' ' && line[i] != '\t' && line[i] != ':')
+        i++;
+    key_end = i;
+    i = skip_spaces(line, i);
+    if (line[i] != ':')
+        return (NULL);
+    i++;
+    i = skip_spaces(line, i);
+    val_start = i;
+    while (line[i] && line[i] != '\n')
+        i++;
+    val_end = i;
+    while (val_end > val_start && (line[val_end - 1] == ' '
+            || line[val_end - 1] == '\t'))
+        val_end--;
+    return (create_node(ft_substr(line, key_start, key_end - key_start),
+            ft_substr(line, val_start, val_end - val_start)));
+}
+
+static char	*read_file(int fd)
+{
+    char	*content;
+    char	*temp;
+    char	buf[2];
+    int		bytes;
+
+    content = ft_strdup("");
+    bytes = read(fd, buf, 1);
+    while (bytes > 0)
+    {
+        buf[1] = '\0';
+        temp = ft_strjoin(content, buf);
+        free(content);
+        content = temp;
+        bytes = read(fd, buf, 1);
+    }
+    return (content);
+}
+
+static void	add_node(t_dict **head, t_dict *node)
+{
+    t_dict	*current;
+
+    if (!node)
+        return ;
+    if (!*head)
+    {
+        *head = node;
+        return ;
+    }
+    current = *head;
+    while (current->next)
+        current = current->next;
+    current->next = node;
+}
+
+static t_dict	*parse_content(char *content)
+{
+    t_dict	*head;
+    int		i;
+    int		line_start;
+    char	*line;
+    t_dict	*node;
+
+    head = NULL;
+    i = 0;
+    while (content[i])
+    {
+        line_start = i;
+        while (content[i] && content[i] != '\n')
+            i++;
+        line = ft_substr(content, line_start, i - line_start);
+        node = parse_line(line);
+        free(line);
+        add_node(&head, node);
+        if (content[i] == '\n')
+            i++;
+    }
+    return (head);
+}
+
+t_dict	*parse_dictionary(char *filename)
+{
+    int		fd;
+    char	*content;
+    t_dict	*dict;
+
+    fd = open(filename, O_RDONLY);
+    if (fd < 0)
+        return (NULL);
+    content = read_file(fd);
+    close(fd);
+    if (!content)
+        return (NULL);
+    dict = parse_content(content);
+    free(content);
+    return (dict);
+}
+
+void	free_dictionary(t_dict *dict)
+{
+    t_dict	*temp;
+
     while (dict)
     {
-        tmp = dict->next;
+        temp = dict->next;
         free(dict->key);
         free(dict->value);
         free(dict);
-        dict = tmp;
+        dict = temp;
     }
 }
