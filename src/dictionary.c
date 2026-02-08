@@ -6,7 +6,7 @@
 /*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/07 14:32:17 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/08 21:36:05 by 2lazy            ###   ########.fr       */
+/*   Updated: 2026/02/08 21:54:23 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,28 +46,25 @@ t_dict	*create_node(char *key, char *value)
 t_dict	*parse_line(char *line)
 {
     int		i;
-    int		key_start;
-    int		key_end;
-    int		val_start;
-    int		val_end;
+    int		pos[4];
     char	*key;
     char	*value;
 
     i = skip_spaces(line, 0);
-    key_start = i;
-    key_end = find_key_end(line, i);
-    if (key_end == key_start)
+    pos[0] = i;
+    pos[1] = find_key_end(line, i);
+    if (pos[1] == pos[0])
         return (NULL);
-    i = skip_spaces(line, key_end);
+    i = skip_spaces(line, pos[1]);
     if (line[i] != ':')
         return (NULL);
     i = skip_spaces(line, i + 1);
-    val_start = i;
-    val_end = find_value_end(line, val_start);
-    if (val_end == val_start)
+    pos[2] = i;
+    pos[3] = find_value_end(line, pos[2]);
+    if (pos[3] == pos[2])
         return (NULL);
-    key = ft_substr(line, key_start, key_end - key_start);
-    value = ft_substr(line, val_start, val_end - val_start);
+    key = ft_substr(line, pos[0], pos[1] - pos[0]);
+    value = ft_substr(line, pos[2], pos[3] - pos[2]);
     return (create_node(key, value));
 }
 
