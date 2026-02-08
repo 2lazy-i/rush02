@@ -6,26 +6,37 @@
 #    By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/07 14:29:45 by 2lazy             #+#    #+#              #
-#    Updated: 2026/02/08 17:57:41 by 2lazy            ###   ########.fr        #
+#    Updated: 2026/02/08 18:23:50 by 2lazy            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = rush-02
+
+SRC = src/main.c \
+      src/parser.c \
+      src/dictionary.c \
+      src/dict_parse.c \
+      src/convert.c \
+      src/triad.c \
+      src/utils.c \
+      src/utils2.c
+
+OBJ = $(SRC:.c=.o)
+
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
-SRCS = src/main.c src/parser.c src/dictionary.c src/convert.c src/triad.c src/utils.c
-OBJS = $(SRCS:.c=.o)
-
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+$(NAME): $(OBJ)
+    $(CC) $(CFLAGS) -o $(NAME) $(OBJ)
 
 clean:
-	rm -f $(OBJS)
+    rm -f $(OBJ)
 
 fclean: clean
-	rm -f $(NAME)
+    rm -f $(NAME)
 
 re: fclean all
+
+.PHONY: all clean fclean re

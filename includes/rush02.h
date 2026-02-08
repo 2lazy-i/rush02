@@ -6,7 +6,7 @@
 /*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/08 17:59:40 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/08 17:59:42 by 2lazy            ###   ########.fr       */
+/*   Updated: 2026/02/08 18:20:01 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,10 @@ typedef struct s_dict
 /* Dictionary functions */
 t_dict	*parse_dictionary(char *filename);
 void	free_dictionary(t_dict *dict);
+t_dict	*parse_line(char *line);
+t_dict	*create_node(char *key, char *value);
+char	*ft_substr(char *str, int start, int len);
+int		skip_spaces(char *line, int i);
 
 /* Parser functions */
 int		validate_args(int argc, char **argv);
