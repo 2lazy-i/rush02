@@ -6,7 +6,7 @@
 /*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/07 14:32:05 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/08 17:14:36 by 2lazy            ###   ########.fr       */
+/*   Updated: 2026/02/08 17:57:52 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 static int	is_all_digits(char *str)
 {
-    int	i;
-
-    i = 0;
+    if (!str || str[0] == '\0')
+        return (0);
+    int i = 0;
     while (str[i])
     {
         if (!ft_isdigit(str[i]))

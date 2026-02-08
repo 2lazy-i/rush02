@@ -6,7 +6,7 @@
 /*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/07 14:31:53 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/08 17:14:24 by 2lazy            ###   ########.fr       */
+/*   Updated: 2026/02/08 17:58:01 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,16 @@ int	main(int argc, char **argv)
         return (1);
     }
     result = convert_number(number, dict);
-    if (result)
+    if (!result)
     {
-        ft_putstr(result);
-        write(1, "\n", 1);
-        free(result);
+        write(1, "Dict Error\n", 11);
+        free(number);
+        free_dictionary(dict);
+        return (1);
     }
+    ft_putstr(result);
+    write(1, "\n", 1);
+    free(result);
     free(number);
     free_dictionary(dict);
     return (0);

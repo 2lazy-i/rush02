@@ -6,7 +6,7 @@
 /*   By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/07 14:33:44 by 2lazy             #+#    #+#             */
-/*   Updated: 2026/02/08 17:15:31 by 2lazy            ###   ########.fr       */
+/*   Updated: 2026/02/08 17:58:11 by 2lazy            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,21 @@ static char	*add_space_word(char *result, char *word)
     char	*tmp;
 
     if (!word)
-        return (result);
-    if (!result || result[0] == '\0')
     {
         if (result)
             free(result);
+        return (NULL);
+    }
+    if (!result)
+        return (NULL);
+    if (result[0] == '\0')
+    {
+        free(result);
         return (ft_strdup(word));
     }
     tmp = ft_strjoin_free(result, " ", 1);
+    if (!tmp)
+        return (NULL);
     return (ft_strjoin_free(tmp, word, 1));
 }
 

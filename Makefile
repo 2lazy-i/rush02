@@ -6,11 +6,11 @@
 #    By: 2lazy <2lazy@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2026/02/07 14:29:45 by 2lazy             #+#    #+#              #
-#    Updated: 2026/02/07 14:55:20 by 2lazy            ###   ########.fr        #
+#    Updated: 2026/02/08 17:57:41 by 2lazy            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = rush02
+NAME = rush-02
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
